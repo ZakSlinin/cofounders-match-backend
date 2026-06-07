@@ -1,0 +1,3 @@
+module github.com/ZakSlinin/cofounders-match-backend/user-service
+
+go 1.26.1
