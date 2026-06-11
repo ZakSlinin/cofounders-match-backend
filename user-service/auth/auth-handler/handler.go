@@ -34,5 +34,22 @@ func (h *authHandler) Register(g *gin.Context) {
 		return
 	}
 
-	g.JSON(http.StatusOK, models.AuthResponse{ID: createdUser.ID, Email: createdUser.Email, Role: createdUser.Role, RefreshToken: refreshToken, AccessToken: accessToken})
+	g.JSON(http.StatusCreated, models.AuthResponse{ID: createdUser.ID, Email: createdUser.Email, Role: createdUser.Role, RefreshToken: refreshToken, AccessToken: accessToken})
+}
+
+func (h *authHandler) Login(g *gin.Context) {
+	var req models.LoginRequest
+
+	if err := g.ShouldBindJSON(&req); err != nil {
+		g.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	user, accessToken, refreshToken, err := h.authService.Login(g.Request.Context(), req.Email, req.Password)
+	if err != nil {
+		g.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	g.JSON(http.StatusOK, models.AuthResponse{ID: user.ID, Email: user.Email, Role: user.Role, RefreshToken: refreshToken, AccessToken: accessToken})
 }
