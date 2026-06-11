@@ -33,7 +33,7 @@ func main() {
 	auth := r.Group("/auth")
 	{
 		auth.POST("/register", authHandler.Register)
-		//TODO: auth.POST("/login", authHandler.Login)
+		auth.POST("/login", authHandler.Login)
 		//TODO: auth.POST("/refresh", authHandler.Refresh)
 	}
 
