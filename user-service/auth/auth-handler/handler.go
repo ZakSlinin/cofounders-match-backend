@@ -1,4 +1,4 @@
-package handler
+package auth_handler
 
 import (
 	auth_service "github.com/ZakSlinin/cofounders-match-backend/user-service/auth/auth-service"

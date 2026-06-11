@@ -2,6 +2,7 @@ package user_repository
 
 import (
 	"context"
+	"errors"
 	"github.com/ZakSlinin/cofounders-match-backend/user-service/models"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -16,6 +17,10 @@ type UserRepository interface {
 
 type PostgresUserRepository struct {
 	db *gorm.DB
+}
+
+func NewPostgresUserRepository(db *gorm.DB) *PostgresUserRepository {
+	return &PostgresUserRepository{db: db}
 }
 
 func (repo *PostgresUserRepository) Create(ctx context.Context, user *models.User) (*models.User, error) {
@@ -33,6 +38,9 @@ func (repo *PostgresUserRepository) GetByEmail(ctx context.Context, email string
 	result := repo.db.WithContext(ctx).Where("email = ?", email).First(&user)
 
 	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
 		return nil, result.Error
 	}
 
