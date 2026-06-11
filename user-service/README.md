@@ -55,7 +55,8 @@ docker-compose up --build -d
 **4. Run migrations**
 
 ```bash
-migrate -path user-service/migrations -database "postgres://postgres:your_password@localhost:5433/cofounders_match?sslmode=disable" up
+cd user-service
+make migrate-up
 ```
 
 Service is available at `http://localhost:8080`

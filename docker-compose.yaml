@@ -17,17 +17,6 @@ services:
       timeout: 5s
       retries: 5
 
-  migrate:
-    build:
-      context: ./user-service
-      dockerfile: Dockerfile
-    command: migrate -path migrations -database "${DB_URL}" up
-    env_file:
-      - ./user-service/.env.docker
-    depends_on:
-      postgres:
-        condition: service_healthy
-
   user-service:
     build:
       context: ./user-service
