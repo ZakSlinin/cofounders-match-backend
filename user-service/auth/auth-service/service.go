@@ -15,6 +15,7 @@ import (
 type AuthService interface {
 	Register(ctx context.Context, email, password, role string) (*models.User, string, string, error)
 	Login(ctx context.Context, email, password string) (*models.User, string, string, error)
+	Refresh(ctx context.Context, refreshToken string) (string, error)
 }
 
 type authService struct {
@@ -75,6 +76,25 @@ func (s *authService) Login(ctx context.Context, email, password string) (*model
 	err = s.repo.SaveTokens(ctx, user.ID, refreshToken)
 
 	return user, accessToken, refreshToken, nil
+}
+
+func (s *authService) Refresh(ctx context.Context, refreshToken string) (string, error) {
+	token, err := s.repo.GetRefreshToken(ctx, refreshToken)
+	if err != nil || token == nil {
+		return "", errors.New("invalid refresh token")
+	}
+
+	if time.Now().After(token.ExpiresAt) {
+		return "", errors.New("refresh token expired")
+	}
+
+	user, err := s.repo.GetByID(ctx, token.UserID)
+	if err != nil {
+		return "", err
+	}
+
+	access, _, err := generateJWT(user)
+	return access, err
 }
 
 func generateJWT(user *models.User) (access, refresh string, err error) {
