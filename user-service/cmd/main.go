@@ -7,6 +7,7 @@ import (
 	"github.com/ZakSlinin/cofounders-match-backend/user-service/cmd/config"
 	db "github.com/ZakSlinin/cofounders-match-backend/user-service/cmd/db"
 	user_repository "github.com/ZakSlinin/cofounders-match-backend/user-service/user/user-repository"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"log"
@@ -14,7 +15,7 @@ import (
 
 func main() {
 	if err := godotenv.Load(); err != nil {
-		log.Fatal("Error loading .env file")
+		log.Println("no .env file, reading from environment")
 	}
 
 	cfg := config.Load()
@@ -30,11 +31,19 @@ func main() {
 
 	r := gin.Default()
 
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"*"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+	}))
+
 	auth := r.Group("/auth")
 	{
 		auth.POST("/register", authHandler.Register)
 		auth.POST("/login", authHandler.Login)
-		//TODO: auth.POST("/refresh", authHandler.Refresh)
+		auth.POST("/refresh", authHandler.Refresh)
 	}
 
 	port := cfg.Port
