@@ -13,6 +13,7 @@ type UserRepository interface {
 	Create(ctx context.Context, user *models.User) (*models.User, error)
 	GetByEmail(ctx context.Context, email string) (*models.User, error)
 	SaveTokens(ctx context.Context, userID uuid.UUID, token string) error
+	GetRefreshToken(ctx context.Context, token string) (*models.RefreshToken, error)
 }
 
 type PostgresUserRepository struct {
@@ -56,4 +57,18 @@ func (repo *PostgresUserRepository) SaveTokens(ctx context.Context, userID uuid.
 
 	result := repo.db.WithContext(ctx).Create(refreshToken)
 	return result.Error
+}
+
+func (repo *PostgresUserRepository) GetRefreshToken(ctx context.Context, token string) (*models.RefreshToken, error) {
+	var refreshToken models.RefreshToken
+	result := repo.db.WithContext(ctx).Where("token = ?", token).Take(&refreshToken)
+
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
+		return nil, result.Error
+	}
+
+	return &refreshToken, nil
 }
