@@ -53,3 +53,20 @@ func (h *authHandler) Login(g *gin.Context) {
 
 	g.JSON(http.StatusOK, models.AuthResponse{ID: user.ID, Email: user.Email, Role: user.Role, RefreshToken: refreshToken, AccessToken: accessToken})
 }
+
+func (h *authHandler) Refresh(g *gin.Context) {
+	var req models.RefreshTokenRequest
+
+	if err := g.ShouldBindJSON(&req); err != nil {
+		g.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	accessToken, err := h.authService.Refresh(g.Request.Context(), req.RefreshToken)
+	if err != nil {
+		g.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		return
+	}
+
+	g.JSON(http.StatusOK, gin.H{"access_token": accessToken})
+}
