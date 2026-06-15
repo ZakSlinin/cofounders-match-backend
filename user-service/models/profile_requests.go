@@ -5,8 +5,7 @@ import (
 	"time"
 )
 
-type Profile struct {
-	ID                   uuid.UUID `gorm:"type:uuid;primary_key" json:"id"`
+type ProfileRequest struct {
 	UserID               uuid.UUID `gorm:"type:uuid;not null" json:"user_id"`
 	Name                 string    `json:"name" gorm:"name"`
 	Bio                  string    `json:"bio" gorm:"bio"`
