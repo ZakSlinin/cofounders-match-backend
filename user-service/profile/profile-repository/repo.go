@@ -7,7 +7,7 @@ import (
 )
 
 type ProfileRepository interface {
-	Create(ctx context.Context, user *models.Profile) (*models.Profile, error)
+	Create(ctx context.Context, profile *models.Profile) (*models.Profile, error)
 }
 
 type PostgresProfileRepository struct {
