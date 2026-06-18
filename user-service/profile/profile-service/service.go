@@ -22,3 +22,7 @@ func (service *ProfileService) Create(ctx context.Context, profile *models.Profi
 
 	return result, nil
 }
+
+func (service *ProfileService) UpdateAvatar(ctx context.Context, userID string, avatarURL string) error {
+	return service.repo.UpdateAvatar(ctx, userID, avatarURL)
+}
