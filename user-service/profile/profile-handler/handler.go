@@ -11,11 +11,11 @@ import (
 )
 
 type ProfileHandler struct {
-	storage storage.StorageService
+	storage *storage.StorageService
 	service profile_service.ProfileService
 }
 
-func NewProfileHandler(service profile_service.ProfileService, storage storage.StorageService) *ProfileHandler {
+func NewProfileHandler(service profile_service.ProfileService, storage *storage.StorageService) *ProfileHandler {
 	return &ProfileHandler{service: service, storage: storage}
 }
 
