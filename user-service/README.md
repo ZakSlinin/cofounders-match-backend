@@ -79,10 +79,13 @@ Service is available at `http://localhost:8080`
 
 ### Profile
 
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| POST | /profiles | ✓ | Create profile |
-| POST | /profiles/avatar | ✓ | Upload avatar |
+| Method | Endpoint      | Description      |
+|--------|---------------|------------------|
+| POST   | /profiles     | Create Profile   |
+| POST   | /profiles/me  | Get my profile   |
+| POST   | /profiles/:id | Get profile by ID |
+| POST   | /profiles/avatar | Upload Avatar    |
+
 
 ---
 
