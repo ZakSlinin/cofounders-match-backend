@@ -6,15 +6,20 @@ import (
 	profile_repository "github.com/ZakSlinin/cofounders-match-backend/user-service/profile/profile-repository"
 )
 
-type ProfileService struct {
+type ProfileService interface {
+	Create(ctx context.Context, profile *models.Profile) (*models.Profile, error)
+	UpdateAvatar(ctx context.Context, userID string, avatarURL string) error
+}
+
+type RepoProfileService struct {
 	repo profile_repository.ProfileRepository
 }
 
-func NewProfileService(repo profile_repository.ProfileRepository) *ProfileService {
-	return &ProfileService{repo: repo}
+func NewProfileService(repo profile_repository.ProfileRepository) ProfileService {
+	return &RepoProfileService{repo: repo}
 }
 
-func (service *ProfileService) Create(ctx context.Context, profile *models.Profile) (*models.Profile, error) {
+func (service *RepoProfileService) Create(ctx context.Context, profile *models.Profile) (*models.Profile, error) {
 	result, err := service.repo.Create(ctx, profile)
 	if err != nil {
 		return nil, err
@@ -23,6 +28,6 @@ func (service *ProfileService) Create(ctx context.Context, profile *models.Profi
 	return result, nil
 }
 
-func (service *ProfileService) UpdateAvatar(ctx context.Context, userID string, avatarURL string) error {
+func (service *RepoProfileService) UpdateAvatar(ctx context.Context, userID string, avatarURL string) error {
 	return service.repo.UpdateAvatar(ctx, userID, avatarURL)
 }
