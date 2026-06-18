@@ -14,6 +14,10 @@ type StorageService struct {
 	bucket string
 }
 
+func NewStorageService(s3Client *s3.Client, bucket string) *StorageService {
+	return &StorageService{client: s3Client, bucket: bucket}
+}
+
 func (service *StorageService) Upload(ctx context.Context, file multipart.File, header *multipart.FileHeader) (string, error) {
 	key := "avatars/" + uuid.New().String() + ".jpg"
 
