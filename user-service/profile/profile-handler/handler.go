@@ -6,6 +6,7 @@ import (
 	storage "github.com/ZakSlinin/cofounders-match-backend/user-service/profile/storage"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/lib/pq"
 	"net/http"
 	"time"
 )
@@ -41,8 +42,8 @@ func (h *ProfileHandler) CreateProfile(g *gin.Context) {
 		Name:                 req.Name,
 		Bio:                  req.Bio,
 		City:                 req.City,
-		LookingFor:           req.LookingFor,
-		Skills:               req.Skills,
+		LookingFor:           pq.StringArray(req.LookingFor),
+		Skills:               pq.StringArray(req.Skills),
 		AvailableForProjects: req.AvailableForProjects,
 		CreatedAt:            time.Now(),
 	})
