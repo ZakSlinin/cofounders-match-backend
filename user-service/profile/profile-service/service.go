@@ -4,12 +4,13 @@ import (
 	"context"
 	"github.com/ZakSlinin/cofounders-match-backend/user-service/models"
 	profile_repository "github.com/ZakSlinin/cofounders-match-backend/user-service/profile/profile-repository"
+	"github.com/google/uuid"
 )
 
 type ProfileService interface {
 	Create(ctx context.Context, profile *models.Profile) (*models.Profile, error)
 	UpdateAvatar(ctx context.Context, userID string, avatarURL string) error
-	GetByUserID(ctx context.Context, userID string) (*models.Profile, error)
+	GetByUserID(ctx context.Context, userID uuid.UUID) (*models.Profile, error)
 }
 
 type RepoProfileService struct {
@@ -33,7 +34,7 @@ func (service *RepoProfileService) UpdateAvatar(ctx context.Context, userID stri
 	return service.repo.UpdateAvatar(ctx, userID, avatarURL)
 }
 
-func (service *RepoProfileService) GetByUserID(ctx context.Context, userID string) (*models.Profile, error) {
+func (service *RepoProfileService) GetByUserID(ctx context.Context, userID uuid.UUID) (*models.Profile, error) {
 	result, err := service.repo.GetByUserID(ctx, userID)
 
 	if err != nil {
