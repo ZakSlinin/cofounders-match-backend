@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: CoFounders Match — User Service
   version: 1.0.0
-  description: Auth API для user-service
+  description: Auth + Profile API для user-service
 
 servers:
   - url: http://localhost:8080
@@ -11,7 +11,7 @@ servers:
 paths:
   /auth/register:
     post:
-      summary: Регистрация
+      summary: Register
       tags: [Auth]
       requestBody:
         required: true
@@ -25,27 +25,19 @@ paths:
               role: founder
       responses:
         '201':
-          description: Успешная регистрация
+          description: Created
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthResponse'
         '400':
-          description: Невалидные данные или email уже занят
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/BadRequest'
         '500':
-          description: Внутренняя ошибка сервера
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/InternalError'
 
   /auth/login:
     post:
-      summary: Логин
+      summary: Login
       tags: [Auth]
       requestBody:
         required: true
@@ -58,27 +50,19 @@ paths:
               password: password123
       responses:
         '200':
-          description: Успешный логин
+          description: OK
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthResponse'
         '400':
-          description: Невалидные данные
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/BadRequest'
         '500':
-          description: Неверные credentials
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/InternalError'
 
   /auth/refresh:
     post:
-      summary: Обновление access токена
+      summary: Refresh access token
       tags: [Auth]
       requestBody:
         required: true
@@ -88,23 +72,80 @@ paths:
               $ref: '#/components/schemas/RefreshRequest'
       responses:
         '200':
-          description: Новый access токен
+          description: New access token
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/RefreshResponse'
         '400':
-          description: Невалидный запрос
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/BadRequest'
         '401':
-          description: Refresh токен невалиден или истёк
+          $ref: '#/components/responses/Unauthorized'
+
+  /profiles:
+    post:
+      summary: Create profile
+      tags: [Profile]
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateProfileRequest'
+            example:
+              name: Zakhar
+              bio: Go developer
+              city: Arzamas
+              skills: [Go, PostgreSQL, Docker]
+              looking_for: [designer, frontend]
+              available_for_projects: true
+      responses:
+        '201':
+          description: Created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                properties:
+                  profile:
+                    $ref: '#/components/schemas/Profile'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /profiles/avatar:
+    post:
+      summary: Upload avatar
+      tags: [Profile]
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  avatar_url:
+                    type: string
+                    example: https://storage.yandexcloud.net/cofounders-match-avatars/avatars/uuid.jpg
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
 
 components:
   schemas:
@@ -115,15 +156,12 @@ components:
         email:
           type: string
           format: email
-          example: test@mail.com
         password:
           type: string
           minLength: 8
-          example: password123
         role:
           type: string
           enum: [founder, developer, designer]
-          example: founder
 
     LoginRequest:
       type: object
@@ -132,10 +170,8 @@ components:
         email:
           type: string
           format: email
-          example: test@mail.com
         password:
           type: string
-          example: password123
 
     RefreshRequest:
       type: object
@@ -143,7 +179,6 @@ components:
       properties:
         refresh_token:
           type: string
-          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
     AuthResponse:
       type: object
@@ -151,39 +186,107 @@ components:
         id:
           type: string
           format: uuid
-          example: 550e8400-e29b-41d4-a716-446655440000
         email:
           type: string
-          example: test@mail.com
         role:
           type: string
-          example: founder
         access_token:
           type: string
-          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
         refresh_token:
           type: string
-          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
     RefreshResponse:
       type: object
       properties:
         access_token:
           type: string
-          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+    CreateProfileRequest:
+      type: object
+      required: [name, bio]
+      properties:
+        name:
+          type: string
+        bio:
+          type: string
+        city:
+          type: string
+        skills:
+          type: array
+          items:
+            type: string
+        looking_for:
+          type: array
+          items:
+            type: string
+        available_for_projects:
+          type: boolean
+
+    Profile:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        bio:
+          type: string
+        avatar_url:
+          type: string
+        city:
+          type: string
+        skills:
+          type: array
+          items:
+            type: string
+        looking_for:
+          type: array
+          items:
+            type: string
+        available_for_projects:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
 
     ErrorResponse:
       type: object
       properties:
         error:
           type: string
-          example: email already exists
+
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    InternalError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
 
   securitySchemes:
     BearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
-
-security:
-  - BearerAuth: []

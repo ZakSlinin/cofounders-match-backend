@@ -1,22 +1,22 @@
 # CoFounders Match — User Service
 
-Auth API: registration, login, token refresh.
+Auth + Profile API.
 
 ## Stack
 
 - Go + Gin
 - PostgreSQL
 - JWT (access 15 min, refresh 30 days)
+- Yandex Cloud Object Storage (avatars)
 
 ## Getting Started
 
-### What you need
+### Prerequisites
 
 - [Docker](https://www.docker.com/get-started)
 - [Docker Compose](https://docs.docker.com/compose/install/)
 - [golang-migrate](https://github.com/golang-migrate/migrate) CLI
 
-Install migrate CLI:
 ```bash
 go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
 ```
@@ -30,7 +30,7 @@ git clone https://github.com/ZakSlinin/cofounders-match-backend.git
 cd cofounders-match-backend
 ```
 
-**2. Create `.env.docker` inside `user-service/`**
+**2. Create `user-service/.env.docker`**
 
 ```env
 DB_USER=postgres
@@ -44,9 +44,13 @@ PORT=8080
 
 JWT_SECRET=your_jwt_secret
 JWT_REFRESH_SECRET=your_refresh_secret
+
+YC_ACCESS_KEY=your_yc_access_key
+YC_SECRET_KEY=your_yc_secret_key
+YC_BUCKET=cofounders-match-avatars
 ```
 
-**3. Start the database**
+**3. Build and start**
 
 ```bash
 docker-compose up --build -d
@@ -61,16 +65,39 @@ make migrate-up
 
 Service is available at `http://localhost:8080`
 
+---
+
+## API
+
+### Auth
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | /auth/register | Register |
+| POST | /auth/login | Login |
+| POST | /auth/refresh | Refresh access token |
+
+### Profile
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| POST | /profiles | ✓ | Create profile |
+| POST | /profiles/avatar | ✓ | Upload avatar |
+
+---
+
 ## Authorization
 
-All protected endpoints require the header:
+Protected endpoints require:
 
 ```
 Authorization: Bearer <access_token>
 ```
 
-Access token expires in **15 minutes**. Use refresh token to get a new one when you receive `401`.
+Access token expires in **15 minutes**. On `401` use refresh token to get a new one.
+
+---
 
 ## Full API Docs
 
-Open `openapi.yaml` in [Swagger Editor](https://editor.swagger.io) for interactive documentation.
+Open `openapi.yaml` in [Swagger Editor](https://editor.swagger.io).
