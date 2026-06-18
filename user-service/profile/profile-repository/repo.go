@@ -8,6 +8,7 @@ import (
 
 type ProfileRepository interface {
 	Create(ctx context.Context, profile *models.Profile) (*models.Profile, error)
+	UpdateAvatar(ctx context.Context, userID string, avatarURL string) error
 }
 
 type PostgresProfileRepository struct {
@@ -26,4 +27,12 @@ func (repo *PostgresProfileRepository) Create(ctx context.Context, profile *mode
 	}
 
 	return profile, nil
+}
+
+func (repo *PostgresProfileRepository) UpdateAvatar(ctx context.Context, userID string, avatarURL string) error {
+	result := repo.db.WithContext(ctx).
+		Model(&models.Profile{}).
+		Where("user_id = ?", userID).
+		Update("avatar_url", avatarURL)
+	return result.Error
 }
