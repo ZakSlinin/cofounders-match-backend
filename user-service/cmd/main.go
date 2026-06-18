@@ -68,7 +68,10 @@ func main() {
 	{
 		protected.POST("/profiles", profileHanlder.CreateProfile)
 		protected.POST("/profiles/avatar", profileHanlder.UploadAvatar)
+		protected.GET("/profiles/me", profileHanlder.GetMe)
 	}
+
+	r.GET("/profiles/:user_id", profileHanlder.GetByUserID)
 
 	port := cfg.Port
 	fmt.Println("Starting server on port", port)
