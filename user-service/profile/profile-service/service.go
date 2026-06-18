@@ -9,6 +9,7 @@ import (
 type ProfileService interface {
 	Create(ctx context.Context, profile *models.Profile) (*models.Profile, error)
 	UpdateAvatar(ctx context.Context, userID string, avatarURL string) error
+	GetByUserID(ctx context.Context, userID string) (*models.Profile, error)
 }
 
 type RepoProfileService struct {
@@ -30,4 +31,14 @@ func (service *RepoProfileService) Create(ctx context.Context, profile *models.P
 
 func (service *RepoProfileService) UpdateAvatar(ctx context.Context, userID string, avatarURL string) error {
 	return service.repo.UpdateAvatar(ctx, userID, avatarURL)
+}
+
+func (service *RepoProfileService) GetByUserID(ctx context.Context, userID string) (*models.Profile, error) {
+	result, err := service.repo.GetByUserID(ctx, userID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
 }
