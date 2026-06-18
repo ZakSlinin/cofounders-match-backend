@@ -40,7 +40,6 @@ func (h *ProfileHandler) CreateProfile(g *gin.Context) {
 		UserID:               userID,
 		Name:                 req.Name,
 		Bio:                  req.Bio,
-		AvatarURL:            req.AvatarURL,
 		City:                 req.City,
 		LookingFor:           req.LookingFor,
 		Skills:               req.Skills,
