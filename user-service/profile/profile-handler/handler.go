@@ -75,3 +75,52 @@ func (h *ProfileHandler) UploadAvatar(g *gin.Context) {
 	h.service.UpdateAvatar(g.Request.Context(), userID, url)
 	g.JSON(http.StatusOK, gin.H{"avatar_url": url})
 }
+
+func (h *ProfileHandler) GetByUserID(g *gin.Context) {
+	userIDstr := g.Param("user_id")
+	userID, err := uuid.Parse(userIDstr)
+
+	if err != nil {
+		g.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if err != nil {
+		g.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	profile, err := h.service.GetByUserID(g.Request.Context(), userID)
+
+	if err != nil {
+		g.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	if profile == nil {
+		g.JSON(http.StatusNotFound, gin.H{"error": "profile not found"})
+		return
+	}
+
+	g.JSON(http.StatusOK, gin.H{"profile": profile})
+}
+
+func (h *ProfileHandler) GetMe(g *gin.Context) {
+	userID, err := uuid.Parse(g.GetString("user_id"))
+	if err != nil {
+		g.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	profile, err := h.service.GetByUserID(g.Request.Context(), userID)
+	if err != nil {
+		g.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	if profile == nil {
+		g.JSON(http.StatusNotFound, gin.H{"error": "profile not found"})
+		return
+	}
+
+	g.JSON(http.StatusOK, gin.H{"profile": profile})
+}

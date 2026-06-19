@@ -3,12 +3,15 @@ package profile_repository
 import (
 	"context"
 	"github.com/ZakSlinin/cofounders-match-backend/user-service/models"
+	"github.com/google/uuid"
 	"gorm.io/gorm"
+	"log"
 )
 
 type ProfileRepository interface {
 	Create(ctx context.Context, profile *models.Profile) (*models.Profile, error)
 	UpdateAvatar(ctx context.Context, userID string, avatarURL string) error
+	GetByUserID(ctx context.Context, userID uuid.UUID) (*models.Profile, error)
 }
 
 type PostgresProfileRepository struct {
@@ -35,4 +38,17 @@ func (repo *PostgresProfileRepository) UpdateAvatar(ctx context.Context, userID 
 		Where("user_id = ?", userID).
 		Update("avatar_url", avatarURL)
 	return result.Error
+}
+
+func (repo *PostgresProfileRepository) GetByUserID(ctx context.Context, userID uuid.UUID) (*models.Profile, error) {
+	var profile models.Profile
+	result := repo.db.WithContext(ctx).Where("user_id = ?", userID).Take(&profile)
+
+	log.Printf("GetByUserID: userID=%s, error=%v, profile=%+v", userID, result.Error, profile)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return &profile, nil
 }

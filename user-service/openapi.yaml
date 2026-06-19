@@ -146,6 +146,42 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
+  /profiles/me:
+    get:
+      summary: Get my profile
+      tags: [ Profile ]
+      security:
+        - BearerAuth: [ ]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /profiles/{id}:
+    get:
+      summary: Get profile by ID
+      tags: [ Profile ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile'
+        '404':
+          $ref: '#/components/responses/NotFound'
 
 components:
   schemas:
