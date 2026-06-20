@@ -210,6 +210,41 @@ paths:
                 $ref: '#/components/schemas/Profile'
         '404':
           $ref: '#/components/responses/NotFound'
+  /feed:
+    get:
+      summary: Get profiles feed
+      tags: [ Profile ]
+      security:
+        - BearerAuth: [ ]
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  profiles:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Profile'
+                  limit:
+                    type: integer
+                  offset:
+                    type: integer
+        '401':
+          $ref: '#/components/responses/Unauthorized'
 
 components:
   schemas:
