@@ -12,6 +12,7 @@ type ProfileService interface {
 	UpdateAvatar(ctx context.Context, userID string, avatarURL string) error
 	GetByUserID(ctx context.Context, userID uuid.UUID) (*models.Profile, error)
 	UpdateProfile(ctx context.Context, userID uuid.UUID, update *models.UpdateProfileRequest) (*models.Profile, error)
+	GetFeed(ctx context.Context, userID uuid.UUID, limit, offset int) ([]*models.Profile, error)
 }
 
 type RepoProfileService struct {
@@ -47,4 +48,8 @@ func (service *RepoProfileService) GetByUserID(ctx context.Context, userID uuid.
 
 func (service *RepoProfileService) UpdateProfile(ctx context.Context, userID uuid.UUID, update *models.UpdateProfileRequest) (*models.Profile, error) {
 	return service.repo.UpdateProfile(ctx, userID, update)
+}
+
+func (service *RepoProfileService) GetFeed(ctx context.Context, userID uuid.UUID, limit, offset int) ([]*models.Profile, error) {
+	return service.repo.GetFeed(ctx, userID, limit, offset)
 }

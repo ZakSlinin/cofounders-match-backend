@@ -86,6 +86,7 @@ Service is available at `http://localhost:8080`
 | PATCH  | /profiles/me     | Update my profile |
 | POST   | /profiles/:id    | Get profile by ID |
 | POST   | /profiles/avatar | Upload Avatar     |
+| GET    | /feed            | Get feed          |
 
 
 ---
