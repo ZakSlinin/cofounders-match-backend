@@ -13,6 +13,7 @@ type ProfileRepository interface {
 	Create(ctx context.Context, profile *models.Profile) (*models.Profile, error)
 	UpdateAvatar(ctx context.Context, userID string, avatarURL string) error
 	GetByUserID(ctx context.Context, userID uuid.UUID) (*models.Profile, error)
+	UpdateProfile(ctx context.Context, userID uuid.UUID, update *models.UpdateProfileRequest) (*models.Profile, error)
 }
 
 type PostgresProfileRepository struct {
