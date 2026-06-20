@@ -14,6 +14,7 @@ type ProfileRepository interface {
 	UpdateAvatar(ctx context.Context, userID string, avatarURL string) error
 	GetByUserID(ctx context.Context, userID uuid.UUID) (*models.Profile, error)
 	UpdateProfile(ctx context.Context, userID uuid.UUID, update *models.UpdateProfileRequest) (*models.Profile, error)
+	GetFeed(ctx context.Context, userID uuid.UUID, limit, offset int) ([]*models.Profile, error)
 }
 
 type PostgresProfileRepository struct {
@@ -82,4 +83,15 @@ func (repo *PostgresProfileRepository) UpdateProfile(ctx context.Context, userID
 
 	repo.db.WithContext(ctx).Save(profile)
 	return profile, nil
+}
+
+func (repo *PostgresProfileRepository) GetFeed(ctx context.Context, userID uuid.UUID, limit, offset int) ([]*models.Profile, error) {
+	var profiles []*models.Profile
+	result := repo.db.WithContext(ctx).
+		Where("user_id != ?", userID).
+		Limit(limit).
+		Offset(offset).
+		Find(&profiles)
+
+	return profiles, result.Error
 }
