@@ -1,6 +1,7 @@
 package profile_handler
 
 import (
+	"fmt"
 	"github.com/ZakSlinin/cofounders-match-backend/user-service/models"
 	profile_service "github.com/ZakSlinin/cofounders-match-backend/user-service/profile/profile-service"
 	storage "github.com/ZakSlinin/cofounders-match-backend/user-service/profile/storage"
@@ -148,4 +149,30 @@ func (h *ProfileHandler) UpdateProfile(g *gin.Context) {
 	}
 
 	g.JSON(http.StatusOK, gin.H{"profile": profile})
+}
+
+func (h *ProfileHandler) GetFeed(g *gin.Context) {
+	userID, err := uuid.Parse(g.GetString("user_id"))
+	if err != nil {
+		g.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	limit := 20
+	offset := 0
+
+	if l := g.Query("limit"); l != "" {
+		fmt.Sscan(l, &limit)
+	}
+	if o := g.Query("offset"); o != "" {
+		fmt.Sscan(o, &offset)
+	}
+
+	profiles, err := h.service.GetFeed(g.Request.Context(), userID, limit, offset)
+	if err != nil {
+		g.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	g.JSON(http.StatusOK, gin.H{"profiles": profiles, "limit": limit, "offset": offset})
 }
