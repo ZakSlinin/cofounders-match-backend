@@ -161,6 +161,34 @@ paths:
                 $ref: '#/components/schemas/Profile'
         '401':
           $ref: '#/components/responses/Unauthorized'
+    patch:
+      summary: Update my profile
+      tags: [ Profile ]
+      security:
+        - BearerAuth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProfileRequest'
+            example:
+              bio: Updated bio
+              city: Moscow
+              skills: [ Go, Kafka ]
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                properties:
+                  profile:
+                    $ref: '#/components/schemas/Profile'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
 
   /profiles/{id}:
     get:
@@ -288,6 +316,25 @@ components:
         created_at:
           type: string
           format: date-time
+    UpdateProfileRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        bio:
+          type: string
+        city:
+          type: string
+        skills:
+          type: array
+          items:
+            type: string
+        looking_for:
+          type: array
+          items:
+            type: string
+        available_for_projects:
+          type: boolean
 
     ErrorResponse:
       type: object

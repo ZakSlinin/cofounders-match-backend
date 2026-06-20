@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/ZakSlinin/cofounders-match-backend/user-service/models"
 	"github.com/google/uuid"
+	"github.com/lib/pq"
 	"gorm.io/gorm"
 	"log"
 )
@@ -12,6 +13,7 @@ type ProfileRepository interface {
 	Create(ctx context.Context, profile *models.Profile) (*models.Profile, error)
 	UpdateAvatar(ctx context.Context, userID string, avatarURL string) error
 	GetByUserID(ctx context.Context, userID uuid.UUID) (*models.Profile, error)
+	UpdateProfile(ctx context.Context, userID uuid.UUID, update *models.UpdateProfileRequest) (*models.Profile, error)
 }
 
 type PostgresProfileRepository struct {
@@ -51,4 +53,33 @@ func (repo *PostgresProfileRepository) GetByUserID(ctx context.Context, userID u
 	}
 
 	return &profile, nil
+}
+
+func (repo *PostgresProfileRepository) UpdateProfile(ctx context.Context, userID uuid.UUID, update *models.UpdateProfileRequest) (*models.Profile, error) {
+	profile, err := repo.GetByUserID(ctx, userID)
+	if err != nil || profile == nil {
+		return nil, err
+	}
+
+	if update.Name != nil {
+		profile.Name = *update.Name
+	}
+	if update.Bio != nil {
+		profile.Bio = *update.Bio
+	}
+	if update.City != nil {
+		profile.City = *update.City
+	}
+	if update.Skills != nil {
+		profile.Skills = pq.StringArray(update.Skills)
+	}
+	if update.LookingFor != nil {
+		profile.LookingFor = pq.StringArray(update.LookingFor)
+	}
+	if update.AvailableForProjects != nil {
+		profile.AvailableForProjects = *update.AvailableForProjects
+	}
+
+	repo.db.WithContext(ctx).Save(profile)
+	return profile, nil
 }

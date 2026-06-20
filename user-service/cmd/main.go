@@ -69,6 +69,7 @@ func main() {
 		protected.POST("/profiles", profileHanlder.CreateProfile)
 		protected.POST("/profiles/avatar", profileHanlder.UploadAvatar)
 		protected.GET("/profiles/me", profileHanlder.GetMe)
+		protected.PATCH("/profiles/me", profileHanlder.UpdateProfile)
 	}
 
 	r.GET("/profiles/:user_id", profileHanlder.GetByUserID)

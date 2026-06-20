@@ -124,3 +124,28 @@ func (h *ProfileHandler) GetMe(g *gin.Context) {
 
 	g.JSON(http.StatusOK, gin.H{"profile": profile})
 }
+
+func (h *ProfileHandler) UpdateProfile(g *gin.Context) {
+	userID, err := uuid.Parse(g.GetString("user_id"))
+
+	if err != nil {
+		g.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	var req models.UpdateProfileRequest
+
+	if err := g.ShouldBindJSON(&req); err != nil {
+		g.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	profile, updatedProfileErr := h.service.UpdateProfile(g.Request.Context(), userID, &req)
+
+	if updatedProfileErr != nil {
+		g.JSON(http.StatusInternalServerError, gin.H{"error": updatedProfileErr.Error()})
+		return
+	}
+
+	g.JSON(http.StatusOK, gin.H{"profile": profile})
+}
