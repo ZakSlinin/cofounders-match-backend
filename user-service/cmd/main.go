@@ -70,6 +70,8 @@ func main() {
 		protected.POST("/profiles/avatar", profileHanlder.UploadAvatar)
 		protected.GET("/profiles/me", profileHanlder.GetMe)
 		protected.PATCH("/profiles/me", profileHanlder.UpdateProfile)
+
+		protected.GET("/feed", profileHanlder.GetFeed)
 	}
 
 	r.GET("/profiles/:user_id", profileHanlder.GetByUserID)
