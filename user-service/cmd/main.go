@@ -47,6 +47,7 @@ func main() {
 
 	r := gin.Default()
 
+	//TODO: only gateway instead of all domains
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"*"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
