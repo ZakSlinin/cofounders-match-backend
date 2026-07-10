@@ -1,7 +1,7 @@
 package db
 
 import (
-	"github.com/ZakSlinin/cofounders-match-backend/user-service/cmd/config"
+	"github.com/ZakSlinin/cofounders-match-backend/match-service/cmd/config"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
