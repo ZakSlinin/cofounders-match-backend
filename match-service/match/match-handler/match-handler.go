@@ -15,7 +15,7 @@ func NewMatchHandler(matchService *service.MatchService) *MatchHandler {
 }
 
 func (h *MatchHandler) GetMatches(g *gin.Context) {
-	userID := g.GetString("user_id")
+	userID := g.GetHeader("X-User-ID")
 
 	matches, err := h.matchService.GetMatches(g.Request.Context(), userID)
 	if err != nil {
@@ -27,7 +27,7 @@ func (h *MatchHandler) GetMatches(g *gin.Context) {
 }
 
 func (h *MatchHandler) DeleteMatch(g *gin.Context) {
-	userID := g.GetString("user_id")
+	userID := g.GetHeader("X-User-ID")
 	matchID := g.Param("id")
 
 	if err := h.matchService.DeleteMatch(g.Request.Context(), matchID, userID); err != nil {
