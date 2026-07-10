@@ -24,7 +24,7 @@ func NewProfileHandler(service profile_service.ProfileService, storage *storage.
 func (h *ProfileHandler) CreateProfile(g *gin.Context) {
 	var req models.CreateProfileRequest
 
-	userIDstr := g.GetString("user_id")
+	userIDstr := g.GetHeader("X-User-ID")
 	userID, err := uuid.Parse(userIDstr)
 
 	if err != nil {
@@ -58,7 +58,7 @@ func (h *ProfileHandler) CreateProfile(g *gin.Context) {
 }
 
 func (h *ProfileHandler) UploadAvatar(g *gin.Context) {
-	userID := g.GetString("user_id")
+	userID := g.GetHeader("X-User-ID")
 
 	file, header, err := g.Request.FormFile("file")
 	if err != nil {
@@ -107,7 +107,7 @@ func (h *ProfileHandler) GetByUserID(g *gin.Context) {
 }
 
 func (h *ProfileHandler) GetMe(g *gin.Context) {
-	userID, err := uuid.Parse(g.GetString("user_id"))
+	userID, err := uuid.Parse(g.GetHeader("X-User-ID"))
 	if err != nil {
 		g.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -127,7 +127,7 @@ func (h *ProfileHandler) GetMe(g *gin.Context) {
 }
 
 func (h *ProfileHandler) UpdateProfile(g *gin.Context) {
-	userID, err := uuid.Parse(g.GetString("user_id"))
+	userID, err := uuid.Parse(g.GetHeader("X-User-ID"))
 
 	if err != nil {
 		g.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -152,7 +152,7 @@ func (h *ProfileHandler) UpdateProfile(g *gin.Context) {
 }
 
 func (h *ProfileHandler) GetFeed(g *gin.Context) {
-	userID, err := uuid.Parse(g.GetString("user_id"))
+	userID, err := uuid.Parse(g.GetHeader("X-User-ID"))
 	if err != nil {
 		g.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
