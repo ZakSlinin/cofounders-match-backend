@@ -6,7 +6,6 @@ import (
 	auth_service "github.com/ZakSlinin/cofounders-match-backend/user-service/auth/auth-service"
 	"github.com/ZakSlinin/cofounders-match-backend/user-service/cmd/config"
 	db "github.com/ZakSlinin/cofounders-match-backend/user-service/cmd/db"
-	"github.com/ZakSlinin/cofounders-match-backend/user-service/cmd/middleware"
 	profile_handler "github.com/ZakSlinin/cofounders-match-backend/user-service/profile/profile-handler"
 	profile_repository "github.com/ZakSlinin/cofounders-match-backend/user-service/profile/profile-repository"
 	profile_service "github.com/ZakSlinin/cofounders-match-backend/user-service/profile/profile-service"
@@ -64,7 +63,6 @@ func main() {
 	}
 
 	protected := r.Group("/")
-	protected.Use(middleware.JWTMiddleware())
 	{
 		protected.POST("/profiles", profileHanlder.CreateProfile)
 		protected.POST("/profiles/avatar", profileHanlder.UploadAvatar)
