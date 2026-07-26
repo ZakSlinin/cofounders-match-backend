@@ -10,13 +10,28 @@ import (
 	profile_repository "github.com/ZakSlinin/cofounders-match-backend/user-service/profile/profile-repository"
 	profile_service "github.com/ZakSlinin/cofounders-match-backend/user-service/profile/profile-service"
 	"github.com/ZakSlinin/cofounders-match-backend/user-service/profile/storage"
+	vision_service "github.com/ZakSlinin/cofounders-match-backend/user-service/profile/vision-service"
 	user_repository "github.com/ZakSlinin/cofounders-match-backend/user-service/user/user-repository"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/golang-migrate/migrate/v4"
+	_ "github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/joho/godotenv"
 	"log"
 	"os"
 )
+
+func runMigrations(dsn string) error {
+	m, err := migrate.New("file://migrations", dsn)
+	if err != nil {
+		return err
+	}
+	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
+		return err
+	}
+	return nil
+}
 
 func main() {
 	if err := godotenv.Load(); err != nil {
@@ -24,6 +39,10 @@ func main() {
 	}
 
 	cfg := config.Load()
+
+	if err := runMigrations(cfg.DBURL); err != nil {
+		log.Fatal("migrations failed:", err)
+	}
 
 	gormDB, err := db.NewPostgres(cfg)
 	if err != nil {
@@ -43,7 +62,8 @@ func main() {
 
 	// --- storage service ---
 	storageService := storage.NewStorageService(s3Client, os.Getenv("YC_BUCKET"))
-	profileHanlder := profile_handler.NewProfileHandler(profileService, storageService)
+	visionService := vision_service.NewVisionService(os.Getenv("VISION_API_KEY"), os.Getenv("VISION_FOLDER_ID"))
+	profileHanlder := profile_handler.NewProfileHandler(profileService, storageService, visionService)
 
 	r := gin.Default()
 

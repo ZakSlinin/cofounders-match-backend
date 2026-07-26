@@ -16,11 +16,11 @@ import (
 type ProfileHandler struct {
 	storage       *storage.StorageService
 	service       profile_service.ProfileService
-	visionService vision_service.VisionService
+	visionService vision_service.VisionServiceInterface
 }
 
-func NewProfileHandler(service profile_service.ProfileService, storage *storage.StorageService, visionService vision_service.VisionService) *ProfileHandler {
-	return &ProfileHandler{service: service, storage: storage, visionService: visionService}
+func NewProfileHandler(service profile_service.ProfileService, storage *storage.StorageService, visionServiceInterface vision_service.VisionServiceInterface) *ProfileHandler {
+	return &ProfileHandler{service: service, storage: storage, visionService: visionServiceInterface}
 }
 
 func (h *ProfileHandler) CreateProfile(g *gin.Context) {
