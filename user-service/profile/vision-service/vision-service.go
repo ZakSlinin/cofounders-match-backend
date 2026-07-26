@@ -8,12 +8,16 @@ import (
 	"net/http"
 )
 
+type VisionServiceInterface interface {
+	CheckImage(ctx context.Context, imageURL string) (bool, error)
+}
+
 type VisionService struct {
 	apiKey   string
 	folderID string
 }
 
-func NewVisionService(apiKey, folderID string) *VisionService {
+func NewVisionService(apiKey, folderID string) VisionServiceInterface {
 	return &VisionService{apiKey: apiKey, folderID: folderID}
 }
 
