@@ -7,6 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/google/uuid"
 	"mime/multipart"
+	"strings"
 )
 
 type StorageService struct {
@@ -32,4 +33,14 @@ func (service *StorageService) Upload(ctx context.Context, file multipart.File, 
 	}
 
 	return fmt.Sprintf("https://storage.yandexcloud.net/%s/%s", service.bucket, key), nil
+}
+
+func (service *StorageService) Delete(ctx context.Context, url string) error {
+	key := strings.TrimPrefix(url, fmt.Sprintf("https://storage.yandexcloud.net/%s/", service.bucket))
+
+	_, err := service.client.DeleteObject(ctx, &s3.DeleteObjectInput{
+		Bucket: aws.String(service.bucket),
+		Key:    aws.String(key),
+	})
+	return err
 }
