@@ -5,6 +5,7 @@ import (
 	"github.com/ZakSlinin/cofounders-match-backend/user-service/models"
 	profile_service "github.com/ZakSlinin/cofounders-match-backend/user-service/profile/profile-service"
 	storage "github.com/ZakSlinin/cofounders-match-backend/user-service/profile/storage"
+	vision_service "github.com/ZakSlinin/cofounders-match-backend/user-service/profile/vision-service"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/lib/pq"
@@ -13,12 +14,13 @@ import (
 )
 
 type ProfileHandler struct {
-	storage *storage.StorageService
-	service profile_service.ProfileService
+	storage       *storage.StorageService
+	service       profile_service.ProfileService
+	visionService vision_service.VisionService
 }
 
-func NewProfileHandler(service profile_service.ProfileService, storage *storage.StorageService) *ProfileHandler {
-	return &ProfileHandler{service: service, storage: storage}
+func NewProfileHandler(service profile_service.ProfileService, storage *storage.StorageService, visionService vision_service.VisionService) *ProfileHandler {
+	return &ProfileHandler{service: service, storage: storage, visionService: visionService}
 }
 
 func (h *ProfileHandler) CreateProfile(g *gin.Context) {
@@ -70,6 +72,13 @@ func (h *ProfileHandler) UploadAvatar(g *gin.Context) {
 	url, err := h.storage.Upload(g.Request.Context(), file, header)
 	if err != nil {
 		g.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	safe, err := h.visionService.CheckImage(g.Request.Context(), url)
+	if !safe {
+		h.storage.Delete(g.Request.Context(), url) // удаляем из S3
+		g.JSON(http.StatusBadRequest, gin.H{"error": "inappropriate content"})
 		return
 	}
 
