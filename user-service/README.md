@@ -15,11 +15,7 @@ Auth + Profile API.
 
 - [Docker](https://www.docker.com/get-started)
 - [Docker Compose](https://docs.docker.com/compose/install/)
-- [golang-migrate](https://github.com/golang-migrate/migrate) CLI
 
-```bash
-go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
-```
 
 ### Setup
 
@@ -30,37 +26,10 @@ git clone https://github.com/ZakSlinin/cofounders-match-backend.git
 cd cofounders-match-backend
 ```
 
-**2. Create `user-service/.env.docker`**
-
-```env
-DB_USER=postgres
-DB_PASSWORD=your_password
-DB_HOST=postgres
-DB_PORT=5432
-DB_NAME=cofounders_match
-DB_URL=postgres://postgres:your_password@postgres:5432/cofounders_match?sslmode=disable
-
-PORT=8080
-
-JWT_SECRET=your_jwt_secret
-JWT_REFRESH_SECRET=your_refresh_secret
-
-YC_ACCESS_KEY=your_yc_access_key
-YC_SECRET_KEY=your_yc_secret_key
-YC_BUCKET=cofounders-match-avatars
-```
-
-**3. Build and start**
+**2. Build and start**
 
 ```bash
 docker-compose up --build -d
-```
-
-**4. Run migrations**
-
-```bash
-cd user-service
-make migrate-up
 ```
 
 Service is available at `http://localhost:8080`
