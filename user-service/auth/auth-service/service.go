@@ -3,6 +3,7 @@ package auth_service
 import (
 	"context"
 	"errors"
+	confirm_email_service "github.com/ZakSlinin/cofounders-match-backend/user-service/auth/confirm-email-service"
 	"github.com/ZakSlinin/cofounders-match-backend/user-service/models"
 	user_repository "github.com/ZakSlinin/cofounders-match-backend/user-service/user/user-repository"
 	"github.com/golang-jwt/jwt/v4"
@@ -56,6 +57,21 @@ func (s *authService) Register(ctx context.Context, email, password, role string
 	}
 
 	err = s.repo.SaveTokens(ctx, user.ID, refreshToken)
+	if err != nil {
+		return nil, "", "", err
+	}
+
+	emailVerifyToken := uuid.New().String()
+	err = s.repo.SaveEmailToken(ctx, user.ID, emailVerifyToken)
+	if err != nil {
+		return nil, "", "", err
+	}
+
+	confirmURL := os.Getenv("BASE_URL") + "/auth/verify?token=" + emailVerifyToken
+	err = confirm_email_service.SendEmail(email, confirmURL)
+	if err != nil {
+		return nil, "", "", err
+	}
 
 	return user, accessToken, refreshToken, nil
 }

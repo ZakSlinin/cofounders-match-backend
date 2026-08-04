@@ -15,6 +15,7 @@ type UserRepository interface {
 	SaveTokens(ctx context.Context, userID uuid.UUID, token string) error
 	GetRefreshToken(ctx context.Context, token string) (*models.RefreshToken, error)
 	GetByID(ctx context.Context, id uuid.UUID) (*models.User, error)
+	SaveEmailToken(ctx context.Context, userID uuid.UUID, emailToken string) error
 }
 
 type PostgresUserRepository struct {
@@ -86,4 +87,15 @@ func (repo *PostgresUserRepository) GetRefreshToken(ctx context.Context, token s
 	}
 
 	return &refreshToken, nil
+}
+
+func (repo *PostgresUserRepository) SaveEmailToken(ctx context.Context, userID uuid.UUID, emailToken string) error {
+	emailVerifyToken := &models.EmailVerifyToken{
+		UserID:           userID,
+		EmailVerifyToken: emailToken,
+		ExpiresAt:        time.Now().Add(time.Hour * 24 * 30),
+	}
+
+	result := repo.db.WithContext(ctx).Create(emailVerifyToken)
+	return result.Error
 }
