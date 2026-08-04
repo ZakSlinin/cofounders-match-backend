@@ -8,7 +8,9 @@ import (
 	user_repository "github.com/ZakSlinin/cofounders-match-backend/user-service/user/user-repository"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/google/uuid"
+	"github.com/resend/resend-go/v3"
 	"golang.org/x/crypto/bcrypt"
+	"log"
 	"os"
 	"time"
 )
@@ -68,10 +70,17 @@ func (s *authService) Register(ctx context.Context, email, password, role string
 	}
 
 	confirmURL := os.Getenv("BASE_URL") + "/auth/verify?token=" + emailVerifyToken
-	err = confirm_email_service.SendEmail(email, confirmURL)
-	if err != nil {
-		return nil, "", "", err
-	}
+
+	go func(email, confirmURL string) {
+		var res *resend.SendEmailResponse
+		res, err := confirm_email_service.SendEmail(email, confirmURL)
+		if err != nil {
+			log.Printf("failed to send verification email: %v", err)
+			return
+		}
+
+		log.Printf("verification email sent: %+v", res)
+	}(email, confirmURL)
 
 	return user, accessToken, refreshToken, nil
 }
